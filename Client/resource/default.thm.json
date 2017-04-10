@@ -1,9 +1,5 @@
 {
-    "skin":{
-
-    },
-    "autoGenerateExmlsList":true,
-    "exmls":[
-        
-    ]
+  "skin": {},
+  "autoGenerateExmlsList": true,
+  "exmls": []
 }
