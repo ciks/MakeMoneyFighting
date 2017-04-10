@@ -11,6 +11,18 @@
   "modules": [
     {
       "name": "egret"
+    },
+    {
+      "name": "game"
+    },
+    {
+      "name": "res"
+    },
+    {
+      "name": "eui"
+    },
+    {
+      "name": "tween"
     }
   ]
 }
