@@ -31,8 +31,8 @@ class PopupManager {
             PopupManager._mask.graphics.drawRect(0, 0, GlobalSetting.STAGE_WIDTH, GlobalSetting.STAGE_HEIGHT);
             PopupManager._mask.graphics.endFill();
         }
-        ViewManager.MainContainer.touchEnabled = false;
-        ViewManager.MainContainer.touchChildren = false;
+        LayerManager.MainContainer.touchEnabled = false;
+        LayerManager.MainContainer.touchChildren = false;
         GlobalSetting.STAGE.addChild(PopupManager._mask);
         if (PopupManager.WaitShowLayer) {
             PopupManager.WaitShowLayer.Data = data;
@@ -59,6 +59,34 @@ class PopupManager {
         PopupManager.WaitShowLayer.Enter();
     }
     public static hidden(instance: Object): void {
+        var key: string = egret.getQualifiedClassName(instance);
+        var layerInstance: Layer = ObjectPool.GetObjct(key, false);
+        if (layerInstance) {
+            layerInstance.outer();
+            layerInstance.RemoveFromParent();
+            if (PopupManager.CurrentShowLayers.lastIndexOf(layerInstance) >= 0) {
+                PopupManager.CurrentShowLayers.splice(PopupManager.CurrentShowLayers.indexOf(layerInstance), 1);
+            }
+        }
+        if (PopupManager.currentLayer == layerInstance) {
+            if (PopupManager._mask && PopupManager._mask.parent)
+                PopupManager._mask.parent.removeChild(PopupManager._mask);
+            LayerManager.MainContainer.touchEnabled = true;
+            LayerManager.MainContainer.touchChildren = true;
+            PopupManager.currentLayer = null;
+            if (PopupManager.CurrentShowLayers.length > 0) {
+                PopupManager.currentLayer = PopupManager.CurrentShowLayers.pop();
+            }
+        }
+        if (PopupManager.currentLayer) {
+            LayerManager.MainContainer.touchEnabled = false;
+            LayerManager.MainContainer.touchChildren = false;
+            GlobalSetting.STAGE.addChild(PopupManager._mask);
+            GlobalSetting.STAGE.addChild(PopupManager.currentLayer);
+        } else {
+            if (PopupManager._mask.parent)
+                GlobalSetting.STAGE.removeChild(PopupManager._mask);
+        }
 
     }
     public static IsShow(clz: any): boolean {
@@ -68,13 +96,14 @@ class PopupManager {
         return false;
     }
     public static GetWinInstance(clz: any): any {
-        return ObjectPool.GetByClass(clz,false);
+        return ObjectPool.GetByClass(clz, false);
     }
     public static RemoveAll(): void {
-        while(PopupManager.currentLayer)
+        while (PopupManager.currentLayer)
             PopupManager.hidden(PopupManager.currentLayer);
-        while(PopupManager.CurrentShowLayers.length>0)
+        while (PopupManager.CurrentShowLayers.length > 0)
             PopupManager.hidden(PopupManager.CurrentShowLayers.pop());
-        PopupManager.currentLayer=null;
+        PopupManager.currentLayer = null;
     }
+
 }
